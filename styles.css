@@ -1825,7 +1825,9 @@ svg.viz {
   font-size: clamp(1.9rem, 4.4vw, 3.9rem);
   font-weight: 900;
   font-stretch: 110%;
-  line-height: 1;
+  line-height: 1.04;
+  /* nowrap kills soft wraps but honors the <br>, so the quote is exactly two
+     lines at every viewport and every frame of the letter-spacing zoom. */
   white-space: nowrap;
   text-align: center;
   text-transform: uppercase;
