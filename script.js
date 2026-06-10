@@ -1,421 +1,381 @@
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+(() => {
+  "use strict";
 
-const header = document.querySelector("[data-header]");
-const progress = document.querySelector(".page-progress");
-const cursorLight = document.querySelector(".cursor-light");
+  const docEl = document.documentElement;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sda = docEl.classList.contains("sda");
+  const finePointer = window.matchMedia("(pointer: fine)").matches;
 
-function updateChrome() {
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  const progressValue = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-
-  if (progress) {
-    progress.style.transform = `scaleX(${progressValue})`;
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
   }
 
-  if (header) {
-    header.classList.toggle("is-scrolled", window.scrollY > 24);
+  /* ------------------------------ header chrome ------------------------------ */
+
+  const header = document.querySelector("[data-header]");
+
+  function updateHeader() {
+    if (header) {
+      header.classList.toggle("is-scrolled", window.scrollY > 24);
+    }
   }
-}
 
-updateChrome();
-window.addEventListener("scroll", updateChrome, { passive: true });
+  updateHeader();
+  window.addEventListener("scroll", updateHeader, { passive: true });
 
-const scrollStories = document.querySelectorAll("[data-scroll-story]");
-
-function clamp(value, min = 0, max = 1) {
-  return Math.min(Math.max(value, min), max);
-}
-
-function updateScrollStories() {
-  scrollStories.forEach((story) => {
-    const rect = story.getBoundingClientRect();
-    const scrollDistance = Math.max(rect.height - window.innerHeight, 1);
-    const progress = prefersReducedMotion
-      ? 1
-      : clamp(-rect.top / scrollDistance, 0, 1);
-    const items = [...story.querySelectorAll("[data-scroll-item]")];
-
-    story.style.setProperty("--story-progress", progress.toFixed(3));
-
-    items.forEach((item, index) => {
-      const threshold = 0.14 + index * 0.18;
-      const pastThreshold = threshold + 0.16;
-      const isPast = progress >= pastThreshold;
-      const isActive = progress >= threshold && !isPast;
-
-      item.classList.toggle("is-active", prefersReducedMotion || isActive);
-      item.classList.toggle("is-past", !prefersReducedMotion && isPast);
-    });
-  });
-}
-
-if (scrollStories.length) {
-  updateScrollStories();
-  window.addEventListener("scroll", updateScrollStories, { passive: true });
-  window.addEventListener("resize", updateScrollStories, { passive: true });
-}
-
-const serviceStories = document.querySelectorAll("[data-service-story]");
-
-function updateServiceStories() {
-  serviceStories.forEach((story) => {
-    const stage = story.querySelector("[data-service-stage]");
-    const cards = [...story.querySelectorAll("[data-service-card]")];
-
-    if (!stage || !cards.length) {
-      return;
-    }
-
-    stage.classList.add("is-activated");
-
-    const rect = story.getBoundingClientRect();
-    const scrollDistance = Math.max(rect.height - window.innerHeight, 1);
-    const storyProgress = prefersReducedMotion
-      ? 1
-      : clamp(-rect.top / scrollDistance, 0, 1);
-    const segmentSize = 1 / cards.length;
-    const activeIndex = Math.min(
-      cards.length - 1,
-      Math.max(0, Math.floor(storyProgress / segmentSize))
-    );
-    const activeAccent =
-      cards[activeIndex].style.getPropertyValue("--accent") || "#918EF4";
-
-    stage.style.setProperty("--service-progress", storyProgress.toFixed(3));
-    stage.style.setProperty("--active-accent", activeAccent.trim());
-
-    cards.forEach((card, index) => {
-      const localProgress = clamp(
-        (storyProgress - index * segmentSize) / segmentSize,
-        0,
-        1
-      );
-      const isActive = prefersReducedMotion || index === activeIndex;
-      const isPast = !prefersReducedMotion && index < activeIndex;
-
-      card.style.setProperty("--service-local-progress", localProgress.toFixed(3));
-      card.classList.toggle("is-active", isActive);
-      card.classList.toggle("is-past", isPast);
-    });
-  });
-}
-
-if (serviceStories.length) {
-  updateServiceStories();
-  window.addEventListener("scroll", updateServiceStories, { passive: true });
-  window.addEventListener("resize", updateServiceStories, { passive: true });
-}
-
-const clientStories = document.querySelectorAll("[data-client-story]");
-
-function updateClientStories() {
-  clientStories.forEach((story) => {
-    const stage = story.querySelector("[data-client-stage]");
-    const cards = [...story.querySelectorAll("[data-client-card]")];
-
-    if (!stage || !cards.length) {
-      return;
-    }
-
-    stage.classList.add("is-activated");
-
-    const rect = story.getBoundingClientRect();
-    const scrollDistance = Math.max(rect.height - window.innerHeight, 1);
-    const storyProgress = prefersReducedMotion
-      ? 1
-      : clamp(-rect.top / scrollDistance, 0, 1);
-    const segmentSize = 1 / cards.length;
-    const activeIndex = Math.min(
-      cards.length - 1,
-      Math.max(0, Math.floor(storyProgress / segmentSize))
-    );
-
-    cards.forEach((card, index) => {
-      const localProgress = clamp(
-        (storyProgress - index * segmentSize) / segmentSize,
-        0,
-        1
-      );
-      const isActive = prefersReducedMotion || index === activeIndex;
-      const isPast = !prefersReducedMotion && index < activeIndex;
-      const imageVisible = prefersReducedMotion || (isActive && localProgress > 0.38);
-
-      card.style.setProperty("--client-progress", localProgress.toFixed(3));
-      card.classList.toggle("is-active", isActive);
-      card.classList.toggle("is-past", isPast);
-      card.classList.toggle("is-image-visible", imageVisible);
-    });
-  });
-}
-
-if (clientStories.length) {
-  updateClientStories();
-  window.addEventListener("scroll", updateClientStories, { passive: true });
-  window.addEventListener("resize", updateClientStories, { passive: true });
-}
-
-if (cursorLight && !prefersReducedMotion) {
-  window.addEventListener(
-    "pointermove",
-    (event) => {
-      cursorLight.style.opacity = "1";
-      cursorLight.style.left = `${event.clientX}px`;
-      cursorLight.style.top = `${event.clientY}px`;
-    },
-    { passive: true }
+  /* Scroll spy: highlight the nav link for the section in view. */
+  const spyLinks = new Map(
+    [...document.querySelectorAll("[data-spy]")].map((link) => [link.dataset.spy, link])
   );
 
-  window.addEventListener("pointerleave", () => {
-    cursorLight.style.opacity = "0";
-  });
-}
+  if (spyLinks.size) {
+    const spyObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const link = spyLinks.get(entry.target.id);
+          if (link) {
+            link.classList.toggle("is-current", entry.isIntersecting);
+          }
+        });
+      },
+      { rootMargin: "-42% 0px -42% 0px" }
+    );
 
-const revealItems = document.querySelectorAll(".reveal-up");
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) {
-        return;
+    ["services", "clients", "contact"].forEach((id) => {
+      const section = document.getElementById(id);
+      if (section && spyLinks.has(id)) {
+        spyObserver.observe(section);
       }
-
-      const siblings = [...entry.target.parentElement.querySelectorAll(".reveal-up")];
-      const index = Math.max(0, siblings.indexOf(entry.target));
-      entry.target.style.setProperty("--delay", `${Math.min(index * 80, 360)}ms`);
-      entry.target.classList.add("is-visible");
-      revealObserver.unobserve(entry.target);
     });
-  },
-  {
-    threshold: 0.18,
-    rootMargin: "0px 0px -8% 0px",
   }
-);
 
-revealItems.forEach((item) => {
-  if (prefersReducedMotion) {
-    item.classList.add("is-visible");
-  } else {
-    revealObserver.observe(item);
+  /* ------------------------- mandate word splitter --------------------------
+     Wraps each word of the statement in a span and hands it a personal slice
+     of the section's scroll timeline, so the sentence fills word-by-word. */
+
+  if (sda && !reduced) {
+    const statement = document.querySelector("[data-words]");
+
+    if (statement) {
+      const walker = document.createTreeWalker(statement, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+      }
+
+      const words = [];
+      textNodes.forEach((node) => {
+        const parts = node.textContent.split(/(\s+)/);
+        const frag = document.createDocumentFragment();
+        parts.forEach((part) => {
+          if (!part) {
+            return;
+          }
+          if (/^\s+$/.test(part)) {
+            frag.appendChild(document.createTextNode(part));
+          } else {
+            const span = document.createElement("span");
+            span.className = "w";
+            span.textContent = part;
+            frag.appendChild(span);
+            words.push(span);
+          }
+        });
+        node.parentNode.replaceChild(frag, node);
+      });
+
+      const rangeStart = 4;
+      const rangeEnd = 62;
+      const windowSize = 15;
+      const step = words.length > 1 ? (rangeEnd - windowSize - rangeStart) / (words.length - 1) : 0;
+
+      words.forEach((span, index) => {
+        const start = rangeStart + index * step;
+        span.style.animationRange = `contain ${start.toFixed(2)}% contain ${(start + windowSize).toFixed(2)}%`;
+      });
+    }
   }
-});
 
-const counters = document.querySelectorAll("[data-count]");
-const counterObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) {
+  /* ------------------------- pointer-driven garnish --------------------------
+     One rAF loop lerps the cursor light, the tunnel steering, and the
+     scroll-velocity skew on the ticker. */
+
+  if (!reduced) {
+    const cursorLight = finePointer ? document.querySelector(".cursor-light") : null;
+    const tunnelStage = document.querySelector(".tunnel-stage");
+    const tickerStage = document.querySelector("[data-ticker]");
+
+    let tunnelVisible = false;
+    let tickerVisible = false;
+
+    const visibilityObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.target === tunnelStage) {
+          tunnelVisible = entry.isIntersecting;
+        }
+        if (entry.target === tickerStage) {
+          tickerVisible = entry.isIntersecting;
+        }
+      });
+    });
+
+    if (tunnelStage) visibilityObserver.observe(tunnelStage);
+    if (tickerStage) visibilityObserver.observe(tickerStage);
+
+    let pointerX = window.innerWidth / 2;
+    let pointerY = window.innerHeight / 2;
+    let lightX = pointerX;
+    let lightY = pointerY;
+    let lightShown = false;
+    let steerX = 0;
+    let steerY = 0;
+    let skew = 0;
+    let lastScrollY = window.scrollY;
+
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        pointerX = event.clientX;
+        pointerY = event.clientY;
+        if (cursorLight && !lightShown) {
+          lightShown = true;
+          cursorLight.style.opacity = "1";
+        }
+      },
+      { passive: true }
+    );
+
+    window.addEventListener("pointerleave", () => {
+      if (cursorLight) {
+        lightShown = false;
+        cursorLight.style.opacity = "0";
+      }
+    });
+
+    function motionLoop() {
+      if (cursorLight && lightShown) {
+        const prevX = lightX;
+        const prevY = lightY;
+        lightX += (pointerX - lightX) * 0.16;
+        lightY += (pointerY - lightY) * 0.16;
+        const speed = Math.hypot(lightX - prevX, lightY - prevY);
+        const scale = 1 + Math.min(speed / 60, 0.55);
+        cursorLight.style.left = `${lightX.toFixed(1)}px`;
+        cursorLight.style.top = `${lightY.toFixed(1)}px`;
+        cursorLight.style.transform = `translate3d(-50%, -50%, 0) scale(${scale.toFixed(3)})`;
+      }
+
+      if (tunnelStage && tunnelVisible) {
+        const nx = (pointerX / window.innerWidth - 0.5) * 2;
+        const ny = (pointerY / window.innerHeight - 0.5) * 2;
+        steerX += (nx * 90 - steerX) * 0.06;
+        steerY += (ny * 60 - steerY) * 0.06;
+        tunnelStage.style.setProperty("--steer-x", `${steerX.toFixed(1)}px`);
+        tunnelStage.style.setProperty("--steer-y", `${steerY.toFixed(1)}px`);
+      }
+
+      const y = window.scrollY;
+      if (tickerStage && tickerVisible) {
+        const velocity = y - lastScrollY;
+        const target = clamp(velocity * 0.35, -8, 8);
+        skew += (target - skew) * 0.12;
+        tickerStage.style.setProperty("--skew", `${skew.toFixed(2)}deg`);
+      }
+      lastScrollY = y;
+
+      requestAnimationFrame(motionLoop);
+    }
+
+    requestAnimationFrame(motionLoop);
+  }
+
+  /* --------------------------- no-sda fallback engine ------------------------
+     For browsers without scroll-driven animations: class toggles and progress
+     custom properties recreate the journey with transitions. */
+
+  if (!sda && !reduced) {
+    const progressBar = document.querySelector(".page-progress");
+    const clockNum = document.querySelector(".hud-clock-num");
+    const serviceStory = document.querySelector(".services");
+    const serviceStage = document.querySelector("[data-service-stage]");
+    const serviceCards = [...document.querySelectorAll("[data-service-card]")];
+
+    let scrollScheduled = false;
+
+    function updateServiceDeck() {
+      if (!serviceStory || !serviceStage || !serviceCards.length) {
         return;
       }
 
-      const element = entry.target;
-      const target = Number(element.dataset.count);
+      serviceStage.classList.add("is-activated");
+
+      const rect = serviceStory.getBoundingClientRect();
+      const scrollDistance = Math.max(rect.height - window.innerHeight, 1);
+      const storyProgress = clamp(-rect.top / scrollDistance, 0, 1);
+      const segmentSize = 1 / serviceCards.length;
+      const activeIndex = Math.min(
+        serviceCards.length - 1,
+        Math.max(0, Math.floor(storyProgress / segmentSize))
+      );
+
+      serviceStage.style.setProperty("--service-progress", storyProgress.toFixed(3));
+
+      serviceCards.forEach((card, index) => {
+        const localProgress = clamp((storyProgress - index * segmentSize) / segmentSize, 0, 1);
+        const ring = card.querySelector(".svc-ring");
+
+        if (ring) {
+          ring.style.setProperty("--ring-p", localProgress.toFixed(3));
+        }
+        card.classList.toggle("is-active", index === activeIndex);
+        card.classList.toggle("is-past", index < activeIndex);
+      });
+    }
+
+    function onScroll() {
+      if (scrollScheduled) {
+        return;
+      }
+      scrollScheduled = true;
+
+      requestAnimationFrame(() => {
+        scrollScheduled = false;
+
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const pageProgress = maxScroll > 0 ? clamp(window.scrollY / maxScroll, 0, 1) : 0;
+
+        if (progressBar) {
+          progressBar.style.transform = `scaleX(${pageProgress.toFixed(4)})`;
+        }
+        if (clockNum) {
+          clockNum.textContent = `${String(Math.round(pageProgress * 90)).padStart(2, "0")}'`;
+        }
+
+        updateServiceDeck();
+      });
+    }
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+
+    /* Hide the CSS-counter pseudo content; JS owns the clock text here. */
+    if (clockNum) {
+      clockNum.classList.add("js-clock");
+      clockNum.textContent = "00'";
+    }
+
+    /* Tunnel build-in. */
+    const tunnelStage = document.querySelector(".tunnel-stage");
+    if (tunnelStage) {
+      const tunnelObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              tunnelStage.classList.add("in");
+              tunnelObserver.disconnect();
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+      tunnelObserver.observe(tunnelStage);
+    }
+
+    /* Mandate stats: reveal + count up. */
+    function animateCount(el, target) {
       const duration = 1200;
       const start = performance.now();
 
       function tick(now) {
         const elapsed = Math.min((now - start) / duration, 1);
         const eased = 1 - Math.pow(1 - elapsed, 3);
-        element.textContent = Math.round(target * eased).toLocaleString();
-
+        el.textContent = Math.round(target * eased).toLocaleString();
         if (elapsed < 1) {
           requestAnimationFrame(tick);
         }
       }
 
       requestAnimationFrame(tick);
-      counterObserver.unobserve(element);
-    });
-  },
-  { threshold: 0.6 }
-);
-
-counters.forEach((counter) => {
-  if (prefersReducedMotion) {
-    counter.textContent = Number(counter.dataset.count).toLocaleString();
-  } else {
-    counterObserver.observe(counter);
-  }
-});
-
-document.querySelectorAll("[data-tilt]").forEach((card) => {
-  if (prefersReducedMotion) {
-    return;
-  }
-
-  card.addEventListener("pointermove", (event) => {
-    const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-
-    card.style.setProperty("--ry", `${x * 7}deg`);
-    card.style.setProperty("--rx", `${y * -7}deg`);
-  });
-
-  card.addEventListener("pointerleave", () => {
-    card.style.setProperty("--ry", "0deg");
-    card.style.setProperty("--rx", "0deg");
-  });
-});
-
-function initHeroCanvas() {
-  const canvas = document.querySelector("[data-hero-canvas]");
-  if (!canvas) {
-    return;
-  }
-
-  const ctx = canvas.getContext("2d");
-  const colors = ["#004BA8", "#918EF4", "#DB5461", "#F2F3AE"];
-  let width = 0;
-  let height = 0;
-  let dpr = 1;
-  let rafId = 0;
-  let pointerX = 0.66;
-  let pointerY = 0.36;
-
-  const nodes = Array.from({ length: 42 }, (_, index) => ({
-    x: (index * 0.137) % 1,
-    y: (index * 0.241) % 1,
-    speed: 0.00042 + (index % 5) * 0.00008,
-    radius: 1.6 + (index % 4) * 0.8,
-    color: colors[index % colors.length],
-  }));
-
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    width = canvas.clientWidth;
-    height = canvas.clientHeight;
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function drawField(time) {
-    ctx.clearRect(0, 0, width, height);
-
-    const horizon = height * 0.62;
-    const scrollInfluence = Math.min(window.scrollY / Math.max(height, 1), 1);
-
-    ctx.save();
-    ctx.globalAlpha = 0.58;
-    ctx.strokeStyle = "rgba(255,255,255,0.16)";
-    ctx.lineWidth = 1;
-
-    for (let i = 0; i < 14; i += 1) {
-      const y = horizon + i * 42 + scrollInfluence * 42;
-      ctx.beginPath();
-      ctx.moveTo(width * -0.1, y);
-      ctx.lineTo(width * 1.1, y - i * 19);
-      ctx.stroke();
     }
 
-    for (let i = 0; i < 12; i += 1) {
-      const x = width * (i / 11);
-      ctx.beginPath();
-      ctx.moveTo(width * 0.5, horizon - 60);
-      ctx.lineTo(x, height * 1.06);
-      ctx.stroke();
+    const stats = [...document.querySelectorAll(".stat[data-count]")];
+    if (stats.length) {
+      const statObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
+            const stat = entry.target;
+            stat.classList.add("is-active");
+            const real = stat.querySelector(".stat-real");
+            if (real) {
+              animateCount(real, Number(stat.dataset.count));
+            }
+            statObserver.unobserve(stat);
+          });
+        },
+        { threshold: 0.5 }
+      );
+      stats.forEach((stat) => statObserver.observe(stat));
     }
-    ctx.restore();
 
-    const centerX = width * (0.5 + (pointerX - 0.5) * 0.06);
-    const centerY = height * (0.42 + (pointerY - 0.5) * 0.05);
+    /* CTA headline. */
+    const cta = document.querySelector(".cta");
+    if (cta) {
+      const ctaObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              cta.classList.add("in");
+              ctaObserver.disconnect();
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+      ctaObserver.observe(cta);
+    }
 
-    ctx.save();
-    ctx.globalAlpha = 0.82;
-    ctx.strokeStyle = "rgba(242,243,174,0.7)";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.ellipse(centerX, centerY, width * 0.18, height * 0.11, -0.08, 0, Math.PI * 2);
-    ctx.stroke();
+    /* Generic rise-in reveals: marked elements, roster panels, ticker quote. */
+    const revealTargets = [
+      ...document.querySelectorAll("[data-reveal]"),
+      ...document.querySelectorAll(".roster-panel"),
+    ];
+    revealTargets.forEach((el) => el.classList.add("reveal-up"));
 
-    ctx.strokeStyle = "rgba(145,142,244,0.56)";
-    ctx.beginPath();
-    ctx.ellipse(centerX, centerY, width * 0.32, height * 0.19, 0.12, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
+    const quote = document.querySelector(".tk-quote");
 
-    nodes.forEach((node, index) => {
-      const drift = time * node.speed + index;
-      const x = ((node.x + Math.sin(drift) * 0.018 + scrollInfluence * 0.06) % 1) * width;
-      const y = (node.y + Math.cos(drift * 0.8) * 0.025) * height;
-      const linked = nodes[(index + 9) % nodes.length];
-      const linkedX = ((linked.x + Math.sin(time * linked.speed + index) * 0.018) % 1) * width;
-      const linkedY = (linked.y + Math.cos(time * linked.speed * 0.8) * 0.025) * height;
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+          const el = entry.target;
+          if (el.classList.contains("reveal-up")) {
+            const siblings = [...el.parentElement.querySelectorAll(".reveal-up")];
+            const index = Math.max(0, siblings.indexOf(el));
+            el.style.setProperty("--delay", `${Math.min(index * 80, 360)}ms`);
+          }
+          el.classList.add("is-visible");
+          revealObserver.unobserve(el);
+        });
+      },
+      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+    );
 
-      ctx.save();
-      ctx.globalAlpha = 0.24;
-      ctx.strokeStyle = node.color;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(linkedX, linkedY);
-      ctx.stroke();
-      ctx.restore();
+    revealTargets.forEach((el) => revealObserver.observe(el));
+    if (quote) {
+      revealObserver.observe(quote);
+    }
+  }
 
-      ctx.save();
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = node.color;
-      ctx.beginPath();
-      ctx.arc(x, y, node.radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+  /* Reduced motion: make sure stat numbers read their final values. */
+  if (reduced) {
+    document.querySelectorAll(".stat[data-count] .stat-real").forEach((el) => {
+      el.textContent = Number(el.closest(".stat").dataset.count).toLocaleString();
     });
-
-    const pulse = 0.5 + Math.sin(time * 0.002) * 0.5;
-    ctx.save();
-    ctx.globalAlpha = 0.16 + pulse * 0.08;
-    ctx.fillStyle = "#F2F3AE";
-    ctx.fillRect(width * 0.08, height * 0.78, width * 0.44, 2);
-    ctx.fillRect(width * 0.18, height * 0.82, width * 0.56, 2);
-    ctx.fillRect(width * 0.28, height * 0.86, width * 0.5, 2);
-    ctx.restore();
   }
-
-  function animate(time) {
-    drawField(time);
-    rafId = requestAnimationFrame(animate);
-  }
-
-  resize();
-
-  if (prefersReducedMotion) {
-    drawField(0);
-  } else {
-    rafId = requestAnimationFrame(animate);
-  }
-
-  window.addEventListener("resize", resize, { passive: true });
-  window.addEventListener(
-    "pointermove",
-    (event) => {
-      pointerX = event.clientX / window.innerWidth;
-      pointerY = event.clientY / window.innerHeight;
-    },
-    { passive: true }
-  );
-
-  window.addEventListener("beforeunload", () => cancelAnimationFrame(rafId));
-}
-
-initHeroCanvas();
-
-// Kinetic reveal for the Contact CTA headline (mirrors the original design).
-(function () {
-  const cta = document.querySelector(".cta");
-  if (!cta) return;
-  if (prefersReducedMotion) {
-    cta.classList.add("in");
-    return;
-  }
-  const ctaObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          cta.classList.add("in");
-          ctaObserver.unobserve(cta);
-        }
-      });
-    },
-    { threshold: 0.3 }
-  );
-  ctaObserver.observe(cta);
 })();
