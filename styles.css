@@ -638,7 +638,9 @@ h3 {
   line-height: 0.9;
   letter-spacing: -0.03em;
   text-transform: uppercase;
-  font-size: clamp(3rem, 11vw, 10.5rem);
+  /* "PIONEERING" measures 7.52em in Archivo 900 @ 115% stretch; the 1180px
+     column therefore caps the size at ~9.6rem or the trailing G clips. */
+  font-size: clamp(3rem, 11vw, 9.6rem);
 }
 
 .hx-title .line {
@@ -1562,7 +1564,8 @@ h3 {
   text-transform: uppercase;
   letter-spacing: -0.03em;
   line-height: 0.9;
-  font-size: clamp(3rem, 10.4vw, 10.5rem);
+  /* "LET'S PIONEER" measures 8.9em — size from that so it never wraps or clips. */
+  font-size: clamp(1.9rem, 8.6vw, 8rem);
 }
 
 .cta-title .ln {
@@ -3056,7 +3059,8 @@ h3 {
   }
 
   .hx-title {
-    font-size: clamp(2.6rem, 15vw, 4rem);
+    /* (100vw - 36px gutters) / 7.52em — 15vw overflowed on phones. */
+    font-size: clamp(2.2rem, 11.8vw, 3.7rem);
   }
 
   .hx-sub {
