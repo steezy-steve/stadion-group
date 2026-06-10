@@ -1291,57 +1291,117 @@ h3 {
   place-items: center;
 }
 
-.panel-media img {
+/* Official brand files drop in as .logo-img; until then the .logo-set
+   lockups below stand in (no third-party trademark art in the repo). */
+.panel-media .logo-img {
   position: relative;
   z-index: 2;
-  max-width: 100%;
-  max-height: 100%;
+  max-width: min(440px, 80%);
+  max-height: 70%;
   filter: drop-shadow(0 34px 54px rgba(0, 0, 0, 0.55));
 }
 
 .panel-media::after {
   position: absolute;
-  right: 10%;
-  bottom: 4%;
-  left: 10%;
+  right: 14%;
+  bottom: 8%;
+  left: 14%;
   z-index: 0;
-  height: 22%;
+  height: 18%;
   border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4), transparent 68%);
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.42), transparent 68%);
   content: "";
 }
 
-/* Marked placeholder frame: swap in real action stills later. */
-.ph-frame {
-  position: absolute;
-  inset: 4% 12%;
-  z-index: 1;
-  border: 1px dashed rgba(255, 255, 255, 0.28);
-  border-radius: 14px;
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.025) 0 14px,
-      transparent 14px 28px
-    ),
-    rgba(255, 255, 255, 0.02);
-  transform: rotate(-1.6deg);
+.logo-set {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
 }
 
-.ph-frame span {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: 90%;
-  color: rgba(255, 255, 255, 0.4);
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-align: center;
+.logo-word {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 4.6vw, 3.9rem);
+  font-weight: 900;
+  font-stretch: 125%;
+  letter-spacing: 0.02em;
+  line-height: 1;
   text-transform: uppercase;
+  background: linear-gradient(105deg, #fff 32%, var(--violet) 50%, #fff 68%);
+  background-size: 230% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.logo-sub {
+  color: var(--acid);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  text-transform: uppercase;
+}
+
+.hex-emblem {
+  position: relative;
+  display: block;
+  width: clamp(140px, 22vmin, 210px);
+  aspect-ratio: 0.88;
+  margin-bottom: 10px;
+  background: linear-gradient(160deg, var(--violet), var(--blue-bright) 55%, var(--acid));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  filter: drop-shadow(0 18px 44px rgba(0, 75, 168, 0.5));
+}
+
+.hex-emblem i {
+  position: absolute;
+  inset: 3px;
+  display: grid;
+  place-items: center;
+  background: #05060d;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.hex-emblem i::after {
+  width: 24%;
+  aspect-ratio: 0.88;
+  background: var(--acid);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  box-shadow: 0 0 30px rgba(242, 243, 174, 0.5);
+  content: "";
+}
+
+.liv-mark {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 11vw, 8.5rem);
+  font-weight: 900;
+  font-stretch: 125%;
+  letter-spacing: -0.01em;
+  line-height: 0.9;
+  text-transform: uppercase;
+  background: linear-gradient(105deg, #fff 32%, var(--violet) 50%, #fff 68%);
+  background-size: 230% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.liv-dot {
+  display: inline-block;
+  width: 0.13em;
+  height: 0.13em;
+  margin-left: 0.07em;
+  border-radius: 50%;
+  background: var(--acid);
+  box-shadow: 0 0 18px rgba(242, 243, 174, 0.8);
 }
 
 .panel-copy {
@@ -1715,6 +1775,11 @@ h3 {
 
   .arena-core::after {
     animation: core-pulse 3.6s ease-in-out infinite alternate;
+  }
+
+  .logo-word,
+  .liv-mark {
+    animation: logo-sheen 7s linear infinite;
   }
 
   .hx-scroll i {
@@ -2242,14 +2307,15 @@ h3 {
   }
 
   /* Per-panel internal parallax: media drifts against the pan. */
-  .sda .panel-media > img,
+  .sda .logo-set,
+  .sda .panel-media > .logo-img,
   .sda .panel-orb {
     animation: media-drift 1s linear both;
     animation-timeline: --act-roster;
   }
 
-  .sda .panel-hexagon .panel-media > img { animation-range: cover 6% cover 46%; }
-  .sda .panel-liv .panel-media > img { animation-range: cover 30% cover 70%; }
+  .sda .panel-hexagon :is(.logo-set, .logo-img) { animation-range: cover 6% cover 46%; }
+  .sda .panel-liv :is(.logo-set, .logo-img) { animation-range: cover 30% cover 70%; }
   .sda .panel-tee .panel-orb { animation-range: cover 54% cover 94%; }
 
   .sda .panel-ghost {
@@ -2282,14 +2348,6 @@ h3 {
   .sda .panel-tee .pl:nth-child(1) { animation-range: cover 56% cover 71%; }
   .sda .panel-tee .pl:nth-child(2) { animation-range: cover 59% cover 74%; }
   .sda .panel-tee .panel-copy p { animation-range: cover 61% cover 77%; }
-
-  .sda .ph-frame {
-    animation: frame-in 1s linear both;
-    animation-timeline: --act-roster;
-  }
-
-  .sda .panel-hexagon .ph-frame { animation-range: cover 2% cover 24%; }
-  .sda .panel-liv .ph-frame { animation-range: cover 28% cover 50%; }
 
   .sda .panel-orb i:nth-child(2) {
     animation: orb-spin 1s linear both;
@@ -2841,15 +2899,9 @@ h3 {
   to { transform: translateX(7vw); }
 }
 
-@keyframes frame-in {
-  from {
-    opacity: 0;
-    transform: rotate(-1.6deg) scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(-1.6deg) scale(1);
-  }
+@keyframes logo-sheen {
+  from { background-position: 200% 0; }
+  to { background-position: -30% 0; }
 }
 
 @keyframes orb-spin {
