@@ -2039,6 +2039,9 @@ h3 {
     min-height: 0;
     padding-top: 100px;
     padding-bottom: 80px;
+    /* If content is ever taller than the pinned stage, anchor to the top
+       instead of letting centering clip the first line off-screen. */
+    align-content: safe center;
   }
 
   .sda .mandate .section-kicker {
@@ -3139,31 +3142,8 @@ h3 {
     font-size: clamp(2.2rem, 11vmin, 5rem);
   }
 
-  .mandate-stage {
-    padding-top: 110px;
-    padding-bottom: 90px;
-  }
-
-  .mandate-aside {
-    grid-template-columns: 1fr;
-  }
-
-  .sda .mandate-stage {
-    padding-top: 96px;
-    padding-bottom: 60px;
-    gap: 26px;
-  }
-
   .sda .mandate {
     min-height: 340vh;
-  }
-
-  .stat {
-    padding: 16px;
-  }
-
-  .stat-num {
-    font-size: 2.1rem;
   }
 
   .services {
@@ -3241,6 +3221,62 @@ h3 {
 
   .cta-copy {
     text-align: left;
+  }
+}
+
+/* Compact mandate: on any small viewport — narrow phones OR short landscape
+   windows — the whole act must fit inside the pinned 100svh stage with room
+   to spare, or the centered content clips off the top of the screen. */
+@media (max-width: 720px), (max-height: 600px) {
+  .mandate-stage {
+    padding-top: 96px;
+    padding-bottom: 70px;
+    gap: 24px;
+  }
+
+  .mandate-statement {
+    margin-top: 14px;
+    font-size: clamp(1.05rem, 4.9vw, 1.45rem);
+    line-height: 1.3;
+  }
+
+  .mandate-rule {
+    height: 3px;
+    margin-top: 18px;
+  }
+
+  .mandate-ghost {
+    font-size: clamp(6rem, 24vmin, 10rem);
+  }
+
+  .mandate-aside {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .sda .mandate-stage {
+    padding-top: 78px;
+    padding-bottom: 46px;
+    gap: 18px;
+  }
+
+  .stat {
+    padding: 12px 10px;
+  }
+
+  .stat-num {
+    font-size: 1.45rem;
+  }
+
+  .stat-label {
+    margin-top: 6px;
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+  }
+
+  .stat-bar {
+    height: 3px;
+    margin-top: 10px;
   }
 }
 
