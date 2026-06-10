@@ -192,8 +192,15 @@
                 </p>
               </div>
               <div class="service-motion" aria-hidden="true">
-                <span class="svc-ring"></span>
-                <span class="svc-figure">01</span>
+                <!-- Tactics board: the play draws itself toward the target. -->
+                <svg class="viz viz-play" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle class="play-node n1" cx="64" cy="234" r="13" />
+                  <circle class="play-node n2" cx="148" cy="254" r="13" />
+                  <path class="play-x" d="M230 232l26 26m0-26l-26 26" />
+                  <path class="play-route" pathLength="100" d="M64 234 C 130 140, 192 212, 252 150 C 292 110, 314 88, 340 62" />
+                  <path class="play-arrow" d="M340 62l-20 3m20-3l-3 20" />
+                  <circle class="play-target" cx="340" cy="62" r="22" />
+                </svg>
                 <span class="svc-keyword">Strategy</span>
               </div>
             </article>
@@ -207,8 +214,11 @@
                 </p>
               </div>
               <div class="service-motion" aria-hidden="true">
-                <span class="svc-ring"></span>
-                <span class="svc-figure">02</span>
+                <!-- Stadium wave: a hump travels the crowd, settling into an arc. -->
+                <div class="viz viz-wave">
+                  <i></i><i></i><i></i><i></i><i></i><i></i>
+                  <i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
                 <span class="svc-keyword">Fandom</span>
               </div>
             </article>
@@ -222,8 +232,22 @@
                 </p>
               </div>
               <div class="service-motion" aria-hidden="true">
-                <span class="svc-ring"></span>
-                <span class="svc-figure">03</span>
+                <!-- Capital growth: the line chart draws itself upward. -->
+                <svg class="viz viz-chart" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g class="chart-grid">
+                    <path d="M30 250H370" />
+                    <path d="M30 188H370" />
+                    <path d="M30 126H370" />
+                    <path d="M30 64H370" />
+                  </g>
+                  <path class="chart-area" d="M30 250 96 210 162 222 228 152 294 124 356 56V250Z" />
+                  <path class="chart-line" pathLength="100" d="M30 250 96 210 162 222 228 152 294 124 356 56" />
+                  <circle class="chart-dot cd1" cx="96" cy="210" r="5" />
+                  <circle class="chart-dot cd2" cx="162" cy="222" r="5" />
+                  <circle class="chart-dot cd3" cx="228" cy="152" r="5" />
+                  <circle class="chart-dot cd4" cx="294" cy="124" r="5" />
+                  <circle class="chart-peak" cx="356" cy="56" r="7" />
+                </svg>
                 <span class="svc-keyword">Partnerships</span>
               </div>
             </article>
@@ -237,8 +261,17 @@
                 </p>
               </div>
               <div class="service-motion" aria-hidden="true">
-                <span class="svc-ring"></span>
-                <span class="svc-figure">04</span>
+                <!-- Radar: the sweep rotates with scroll; blips ping as it passes. -->
+                <div class="viz viz-radar">
+                  <i class="radar-ring rr1"></i>
+                  <i class="radar-ring rr2"></i>
+                  <i class="radar-ring rr3"></i>
+                  <i class="radar-cross"></i>
+                  <i class="radar-sweep"></i>
+                  <b class="radar-blip rb1"></b>
+                  <b class="radar-blip rb2"></b>
+                  <b class="radar-blip rb3"></b>
+                </div>
                 <span class="svc-keyword">Insight</span>
               </div>
             </article>
@@ -252,8 +285,15 @@
                 </p>
               </div>
               <div class="service-motion" aria-hidden="true">
-                <span class="svc-ring"></span>
-                <span class="svc-figure">05</span>
+                <!-- Identity: scattered shapes converge into one aligned mark. -->
+                <div class="viz viz-brand">
+                  <i class="brand-guide bg-h"></i>
+                  <i class="brand-guide bg-v"></i>
+                  <i class="brand-guide bg-c"></i>
+                  <b class="brand-shape bs-circle"></b>
+                  <b class="brand-shape bs-diamond"></b>
+                  <b class="brand-shape bs-square"></b>
+                </div>
                 <span class="svc-keyword">Brand</span>
               </div>
             </article>
@@ -267,8 +307,11 @@
                 </p>
               </div>
               <div class="service-motion" aria-hidden="true">
-                <span class="svc-ring"></span>
-                <span class="svc-figure">06</span>
+                <!-- Allocation donut: segments draw while the center counts to 100%. -->
+                <div class="viz viz-donut">
+                  <i class="donut-arc"></i>
+                  <b class="donut-core"><span class="donut-pct"></span></b>
+                </div>
                 <span class="svc-keyword">Capital</span>
               </div>
             </article>

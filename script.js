@@ -221,12 +221,6 @@
       serviceStage.style.setProperty("--service-progress", storyProgress.toFixed(3));
 
       serviceCards.forEach((card, index) => {
-        const localProgress = clamp((storyProgress - index * segmentSize) / segmentSize, 0, 1);
-        const ring = card.querySelector(".svc-ring");
-
-        if (ring) {
-          ring.style.setProperty("--ring-p", localProgress.toFixed(3));
-        }
         card.classList.toggle("is-active", index === activeIndex);
         card.classList.toggle("is-past", index < activeIndex);
       });

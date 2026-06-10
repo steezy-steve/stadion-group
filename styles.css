@@ -29,10 +29,16 @@
 }
 
 /* Scrub-animatable custom properties (counters, rings, clocks). */
-@property --ring-p {
+@property --fill {
   syntax: "<number>";
   inherits: false;
   initial-value: 1;
+}
+
+@property --cap-n {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 100;
 }
 
 @property --stat-n {
@@ -1125,51 +1131,14 @@ h3 {
 .service-motion {
   position: relative;
   z-index: 1;
-  display: block;
+  display: grid;
+  place-items: center;
   min-height: 400px;
-}
-
-.svc-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(360px, 80%);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: conic-gradient(
-    var(--accent) calc(var(--ring-p, 1) * 1turn),
-    rgba(255, 255, 255, 0.09) 0
-  );
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-}
-
-.svc-ring::after {
-  position: absolute;
-  inset: 13%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-  content: "";
-}
-
-.svc-figure {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: transparent;
-  -webkit-text-stroke: 1.4px color-mix(in srgb, var(--accent), var(--white) 35%);
-  font-size: clamp(6rem, 11vw, 10rem);
-  font-weight: 900;
-  font-stretch: 115%;
-  line-height: 1;
-  letter-spacing: -0.04em;
 }
 
 .svc-keyword {
   position: absolute;
-  top: 82%;
+  bottom: 4%;
   left: 50%;
   transform: translateX(-50%);
   color: var(--accent);
@@ -1179,6 +1148,324 @@ h3 {
   letter-spacing: 0.24em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+/* Bespoke per-service visualizations. Every piece's base (no-animation)
+   state is the COMPLETED graphic, so reduced-motion and fallback browsers
+   see finished charts; .sda scrubs them in from empty. */
+.viz {
+  position: relative;
+  display: block;
+  width: min(400px, 94%);
+  aspect-ratio: 4 / 3;
+}
+
+svg.viz {
+  overflow: visible;
+}
+
+/* 01 · strategy — tactics board */
+.viz-play .play-node {
+  stroke: color-mix(in srgb, var(--accent), var(--white) 45%);
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.viz-play .play-x {
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.viz-play .play-route {
+  stroke: color-mix(in srgb, var(--accent), var(--white) 55%);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent), transparent 30%));
+}
+
+.viz-play .play-arrow {
+  stroke: var(--acid);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.viz-play .play-target {
+  stroke: var(--acid);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 10px rgba(242, 243, 174, 0.5));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* 02 · fandom — stadium wave */
+.viz-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+  padding: 18% 2% 16%;
+}
+
+.viz-wave i {
+  flex: 1;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent), var(--white) 30%),
+    color-mix(in srgb, var(--accent), transparent 55%)
+  );
+  transform: scaleY(var(--h, 0.5));
+  transform-origin: bottom center;
+}
+
+.viz-wave i:nth-child(1) { --h: 0.38; }
+.viz-wave i:nth-child(2) { --h: 0.52; }
+.viz-wave i:nth-child(3) { --h: 0.66; }
+.viz-wave i:nth-child(4) { --h: 0.8; }
+.viz-wave i:nth-child(5) { --h: 0.9; }
+.viz-wave i:nth-child(6) { --h: 0.97; }
+.viz-wave i:nth-child(7) { --h: 1; }
+.viz-wave i:nth-child(8) { --h: 0.92; }
+.viz-wave i:nth-child(9) { --h: 0.8; }
+.viz-wave i:nth-child(10) { --h: 0.66; }
+.viz-wave i:nth-child(11) { --h: 0.52; }
+.viz-wave i:nth-child(12) { --h: 0.4; }
+
+/* 03 · partnerships — capital growth chart */
+.viz-chart .chart-grid path {
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 1;
+}
+
+.viz-chart .chart-area {
+  fill: var(--accent);
+  opacity: 0.16;
+}
+
+.viz-chart .chart-line {
+  stroke: color-mix(in srgb, var(--accent), var(--white) 30%);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent), transparent 25%));
+}
+
+.viz-chart .chart-dot {
+  fill: var(--white);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.viz-chart .chart-peak {
+  fill: var(--acid);
+  filter: drop-shadow(0 0 12px rgba(242, 243, 174, 0.8));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* 04 · insight — radar */
+.viz-radar {
+  width: min(330px, 80%);
+  aspect-ratio: 1;
+}
+
+.radar-ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+}
+
+.rr1 { width: 100%; height: 100%; }
+.rr2 { width: 66%; height: 66%; }
+.rr3 { width: 33%; height: 33%; }
+
+.radar-cross {
+  position: absolute;
+  inset: 0;
+}
+
+.radar-cross::before,
+.radar-cross::after {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  content: "";
+}
+
+.radar-cross::before {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.radar-cross::after {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.radar-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--accent), transparent 30%) 0deg,
+    transparent 85deg
+  );
+  opacity: 0.5;
+  transform: rotate(576deg);
+}
+
+.radar-blip {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 0 14px var(--accent);
+}
+
+.radar-blip::after {
+  position: absolute;
+  inset: -7px;
+  border: 1px solid color-mix(in srgb, var(--accent), transparent 30%);
+  border-radius: 50%;
+  content: "";
+}
+
+.rb1 { top: 26%; left: 64%; }
+.rb2 { top: 60%; left: 26%; }
+.rb3 { top: 42%; left: 46%; }
+
+/* 05 · brand — shapes align into a mark */
+.viz-brand {
+  width: min(320px, 78%);
+  aspect-ratio: 1;
+}
+
+.brand-guide {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.bg-h {
+  top: 50%;
+  left: -8%;
+  right: -8%;
+  height: 1px;
+  transform-origin: left center;
+}
+
+.bg-v {
+  left: 50%;
+  top: -8%;
+  bottom: -8%;
+  width: 1px;
+  transform-origin: center top;
+}
+
+.bg-c {
+  inset: 12%;
+  background: none;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+}
+
+.brand-shape {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+
+.bs-circle {
+  width: 56%;
+  height: 56%;
+  border: 2.5px solid color-mix(in srgb, var(--accent), var(--white) 25%);
+  border-radius: 50%;
+}
+
+.bs-diamond {
+  width: 44%;
+  height: 44%;
+  border: 2.5px solid var(--acid);
+  rotate: 45deg;
+}
+
+.bs-square {
+  width: 30%;
+  height: 30%;
+  border: 2.5px solid rgba(255, 255, 255, 0.7);
+}
+
+.viz-brand::after {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent), transparent 35%), transparent 70%);
+  opacity: 0;
+  content: "";
+}
+
+/* 06 · capital — allocation donut */
+.viz-donut {
+  display: grid;
+  place-items: center;
+  width: min(300px, 74%);
+  aspect-ratio: 1;
+}
+
+.donut-arc {
+  --fp: calc(var(--fill, 1) * 100%);
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--blue-bright) 0 min(32%, var(--fp)),
+    var(--violet) min(32%, var(--fp)) min(58%, var(--fp)),
+    var(--red) min(58%, var(--fp)) min(78%, var(--fp)),
+    var(--acid) min(78%, var(--fp)) var(--fp),
+    rgba(255, 255, 255, 0.08) var(--fp) 100%
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent 64%, #000 65%);
+  mask: radial-gradient(farthest-side, transparent 64%, #000 65%);
+}
+
+.donut-core {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.donut-pct {
+  color: var(--white);
+  font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+  font-weight: 900;
+  font-stretch: 115%;
+}
+
+.donut-pct::after {
+  counter-reset: cap calc(var(--cap-n, 100));
+  content: counter(cap) "%";
 }
 
 /* ============================== ACT 04 · ROSTER ============================== */
@@ -2218,33 +2505,195 @@ h3 {
     animation-range: cover 24% cover 44%;
   }
 
-  .sda .svc-ring {
-    animation: ring-fill 1s linear both;
-    animation-range: cover 12% cover 80%;
-  }
-
-  .sda .svc-figure {
-    animation: figure-in 1s linear both;
-    animation-range: cover 10% cover 62%;
-  }
-
   .sda .svc-keyword {
     animation: keyword-in 1s linear both;
     animation-range: cover 20% cover 56%;
   }
 
-  .sda .service-card:nth-child(1) :is(.service-index, h3, p, .svc-ring, .svc-figure, .svc-keyword),
+  .sda .service-motion {
+    animation: rise-in 1s linear both;
+    animation-range: cover 10% cover 30%;
+  }
+
+  .sda .service-card:nth-child(1) :is(.service-index, h3, p, .service-motion, .svc-keyword),
   .sda .service-card:nth-child(1)::before { animation-timeline: --svc-1; }
-  .sda .service-card:nth-child(2) :is(.service-index, h3, p, .svc-ring, .svc-figure, .svc-keyword),
+  .sda .service-card:nth-child(2) :is(.service-index, h3, p, .service-motion, .svc-keyword),
   .sda .service-card:nth-child(2)::before { animation-timeline: --svc-2; }
-  .sda .service-card:nth-child(3) :is(.service-index, h3, p, .svc-ring, .svc-figure, .svc-keyword),
+  .sda .service-card:nth-child(3) :is(.service-index, h3, p, .service-motion, .svc-keyword),
   .sda .service-card:nth-child(3)::before { animation-timeline: --svc-3; }
-  .sda .service-card:nth-child(4) :is(.service-index, h3, p, .svc-ring, .svc-figure, .svc-keyword),
+  .sda .service-card:nth-child(4) :is(.service-index, h3, p, .service-motion, .svc-keyword),
   .sda .service-card:nth-child(4)::before { animation-timeline: --svc-4; }
-  .sda .service-card:nth-child(5) :is(.service-index, h3, p, .svc-ring, .svc-figure, .svc-keyword),
+  .sda .service-card:nth-child(5) :is(.service-index, h3, p, .service-motion, .svc-keyword),
   .sda .service-card:nth-child(5)::before { animation-timeline: --svc-5; }
-  .sda .service-card:nth-child(6) :is(.service-index, h3, p, .svc-ring, .svc-figure, .svc-keyword),
+  .sda .service-card:nth-child(6) :is(.service-index, h3, p, .service-motion, .svc-keyword),
   .sda .service-card:nth-child(6)::before { animation-timeline: --svc-6; }
+
+  /* ---- 01 · tactics board (--svc-1) ---- */
+
+  .sda .play-node,
+  .sda .play-x,
+  .sda .play-arrow,
+  .sda .play-target {
+    animation: pop-in 1s linear both;
+    animation-timeline: --svc-1;
+  }
+
+  .sda .play-node.n1 { animation-range: cover 12% cover 20%; }
+  .sda .play-node.n2 { animation-range: cover 16% cover 24%; }
+  .sda .play-x { animation-range: cover 20% cover 28%; }
+
+  .sda .play-route {
+    animation: draw-line 1s linear both;
+    animation-timeline: --svc-1;
+    animation-range: cover 18% cover 58%;
+  }
+
+  .sda .play-arrow { animation-range: cover 56% cover 64%; }
+  .sda .play-target { animation-range: cover 58% cover 70%; }
+
+  /* ---- 02 · stadium wave (--svc-2) ---- */
+
+  .sda .viz-wave i {
+    animation: wave-hump 1s linear both;
+    animation-timeline: --svc-2;
+  }
+
+  .sda .viz-wave i:nth-child(1) { animation-range: cover 12% cover 40%; }
+  .sda .viz-wave i:nth-child(2) { animation-range: cover 15% cover 43%; }
+  .sda .viz-wave i:nth-child(3) { animation-range: cover 18% cover 46%; }
+  .sda .viz-wave i:nth-child(4) { animation-range: cover 21% cover 49%; }
+  .sda .viz-wave i:nth-child(5) { animation-range: cover 24% cover 52%; }
+  .sda .viz-wave i:nth-child(6) { animation-range: cover 27% cover 55%; }
+  .sda .viz-wave i:nth-child(7) { animation-range: cover 30% cover 58%; }
+  .sda .viz-wave i:nth-child(8) { animation-range: cover 33% cover 61%; }
+  .sda .viz-wave i:nth-child(9) { animation-range: cover 36% cover 64%; }
+  .sda .viz-wave i:nth-child(10) { animation-range: cover 39% cover 67%; }
+  .sda .viz-wave i:nth-child(11) { animation-range: cover 42% cover 70%; }
+  .sda .viz-wave i:nth-child(12) { animation-range: cover 45% cover 73%; }
+
+  /* ---- 03 · capital growth chart (--svc-3) ---- */
+
+  .sda .chart-grid {
+    animation: fade-in 1s linear both;
+    animation-timeline: --svc-3;
+    animation-range: cover 10% cover 20%;
+  }
+
+  .sda .chart-line {
+    animation: draw-line 1s linear both;
+    animation-timeline: --svc-3;
+    animation-range: cover 14% cover 60%;
+  }
+
+  .sda .chart-area {
+    animation: fade-in 1s linear both;
+    animation-timeline: --svc-3;
+    animation-range: cover 42% cover 64%;
+  }
+
+  .sda .chart-dot,
+  .sda .chart-peak {
+    animation: pop-in 1s linear both;
+    animation-timeline: --svc-3;
+  }
+
+  .sda .cd1 { animation-range: cover 22% cover 28%; }
+  .sda .cd2 { animation-range: cover 30% cover 36%; }
+  .sda .cd3 { animation-range: cover 38% cover 44%; }
+  .sda .cd4 { animation-range: cover 46% cover 52%; }
+  .sda .chart-peak { animation-range: cover 56% cover 66%; }
+
+  /* ---- 04 · radar (--svc-4) ---- */
+
+  .sda .radar-ring,
+  .sda .radar-cross {
+    animation: fade-in 1s linear both;
+    animation-timeline: --svc-4;
+  }
+
+  .sda .rr1 { animation-range: cover 8% cover 16%; }
+  .sda .rr2 { animation-range: cover 10% cover 18%; }
+  .sda .rr3 { animation-range: cover 12% cover 20%; }
+  .sda .radar-cross { animation-range: cover 8% cover 18%; }
+
+  .sda .radar-sweep {
+    animation: radar-spin 1s linear both;
+    animation-timeline: --svc-4;
+    animation-range: cover 12% cover 78%;
+  }
+
+  .sda .radar-blip {
+    animation: pop-in 1s linear both;
+    animation-timeline: --svc-4;
+  }
+
+  .sda .rb1 { animation-range: cover 28% cover 36%; }
+  .sda .rb2 { animation-range: cover 44% cover 52%; }
+  .sda .rb3 { animation-range: cover 60% cover 68%; }
+
+  /* ---- 05 · brand mark alignment (--svc-5) ---- */
+
+  .sda .bg-h {
+    animation: grow-x 1s linear both;
+    animation-timeline: --svc-5;
+    animation-range: cover 8% cover 22%;
+  }
+
+  .sda .bg-v {
+    animation: grow-y 1s linear both;
+    animation-timeline: --svc-5;
+    animation-range: cover 10% cover 24%;
+  }
+
+  .sda .bg-c {
+    animation: fade-in 1s linear both;
+    animation-timeline: --svc-5;
+    animation-range: cover 14% cover 26%;
+  }
+
+  .sda .bs-circle {
+    animation: converge-a 1s linear both;
+    animation-timeline: --svc-5;
+    animation-range: cover 14% cover 44%;
+  }
+
+  .sda .bs-diamond {
+    animation: converge-b 1s linear both;
+    animation-timeline: --svc-5;
+    animation-range: cover 22% cover 52%;
+  }
+
+  .sda .bs-square {
+    animation: converge-c 1s linear both;
+    animation-timeline: --svc-5;
+    animation-range: cover 30% cover 60%;
+  }
+
+  .sda .viz-brand::after {
+    animation: brand-flash 1s linear both;
+    animation-timeline: --svc-5;
+    animation-range: cover 58% cover 72%;
+  }
+
+  /* ---- 06 · allocation donut (--svc-6) ---- */
+
+  .sda .donut-arc {
+    animation: fill-sweep 1s linear both;
+    animation-timeline: --svc-6;
+    animation-range: cover 14% cover 66%;
+  }
+
+  .sda .donut-core {
+    animation: pop-in 1s linear both;
+    animation-timeline: --svc-6;
+    animation-range: cover 10% cover 20%;
+  }
+
+  .sda .donut-pct::after {
+    animation: cap-count 1s linear both;
+    animation-timeline: --svc-6;
+    animation-range: cover 14% cover 66%;
+  }
 
   /* ---------- act 04 · roster horizontal pan ---------- */
 
@@ -2856,20 +3305,66 @@ h3 {
   }
 }
 
-@keyframes ring-fill {
-  from { --ring-p: 0; }
-  to { --ring-p: 1; }
-}
-
-@keyframes figure-in {
+/* Bespoke service visualizations. Keyframes with no `to` resolve to the
+   element's base state — the completed graphic. */
+@keyframes pop-in {
   from {
     opacity: 0;
-    transform: translate(-50%, -16%);
+    transform: scale(0.2);
   }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -58%);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes draw-line {
+  from { stroke-dashoffset: 100; }
+}
+
+@keyframes wave-hump {
+  0% { transform: scaleY(0.14); }
+  45% { transform: scaleY(1); }
+  100% { transform: scaleY(var(--h, 0.5)); }
+}
+
+@keyframes radar-spin {
+  from { transform: rotate(0deg); }
+}
+
+@keyframes converge-a {
+  from {
+    opacity: 0.15;
+    transform: translate(-70px, -34px) rotate(-40deg);
   }
+}
+
+@keyframes converge-b {
+  from {
+    opacity: 0.15;
+    transform: translate(64px, -48px) rotate(35deg);
+  }
+}
+
+@keyframes converge-c {
+  from {
+    opacity: 0.15;
+    transform: translate(-26px, 66px) rotate(-25deg);
+  }
+}
+
+@keyframes brand-flash {
+  0% { opacity: 0; }
+  50% { opacity: 0.55; }
+  100% { opacity: 0; }
+}
+
+@keyframes fill-sweep {
+  from { --fill: 0; }
+}
+
+@keyframes cap-count {
+  from { --cap-n: 0; }
 }
 
 @keyframes keyword-in {
@@ -3019,6 +3514,11 @@ h3 {
     z-index: 0;
     min-height: 0;
     opacity: 0.34;
+  }
+
+  /* As a faded backdrop the caption just clutters the copy. */
+  .service-motion .svc-keyword {
+    display: none;
   }
 
   .service-card h3 {
