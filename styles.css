@@ -2279,7 +2279,7 @@ h3 {
   .sda .roster-bar {
     animation: grow-x 1s linear both;
     animation-timeline: --act-roster;
-    animation-range: cover 12% cover 88%;
+    animation-range: cover 22% cover 80%;
   }
 
   .sda .roster-index b::after {
@@ -2287,7 +2287,7 @@ h3 {
     content: counter(ros, decimal-leading-zero) " ";
     animation: roster-count 1s linear both;
     animation-timeline: --act-roster;
-    animation-range: cover 12% cover 88%;
+    animation-range: cover 22% cover 80%;
   }
 
   .sda .roster-track {
@@ -2296,7 +2296,9 @@ h3 {
     height: 100%;
     animation: roster-pan 1s linear both;
     animation-timeline: --act-roster;
-    animation-range: cover 12% cover 88%;
+    /* The stage pins at ~cover 18.5% and unpins at ~81.5%; keep the pan
+       inside that window so panel 1 never moves before the section settles. */
+    animation-range: cover 22% cover 80%;
     will-change: transform;
   }
 
@@ -2883,8 +2885,11 @@ h3 {
 
 /* roster */
 
+/* Dwell → pan → dwell: each client holds centered before the track moves. */
 @keyframes roster-pan {
-  to { transform: translateX(-200vw); }
+  0%, 12% { transform: translateX(0); }
+  38%, 62% { transform: translateX(-100vw); }
+  88%, 100% { transform: translateX(-200vw); }
 }
 
 @keyframes roster-count {
